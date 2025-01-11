@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
+import javafx.scene.shape.Rectangle;
 import org.wilczewski.retentionbasin.RetentionBasinService;
 
 import java.io.IOException;
@@ -27,6 +28,12 @@ public class RiverSectionController {
     public TextField inBasinPortTxtField;
     @FXML
     public TextField inBasinHostTxtField;
+    @FXML
+    public Rectangle activeRiverSign;
+    @FXML
+    public Label rainfallTxtLabel;
+    @FXML
+    public Label inflowWaterTxtLabel;
 
 
     RiverSectionService riverSectionService;
@@ -74,9 +81,20 @@ public class RiverSectionController {
         }
     }
 
-
     @FXML
     private void startWorking(ActionEvent actionEvent) throws IOException, InterruptedException {
         riverSectionService.run();
+    }
+
+    public void showRainfall(int rainfall) {
+        rainfallTxtLabel.setText(String.valueOf(rainfall));
+    }
+
+    public void showInflowWater(int inflowWater) {
+        inflowWaterTxtLabel.setText(String.valueOf(inflowWater));
+    }
+
+    public void showActiveRiverSign() {
+        activeRiverSign.setVisible(true);
     }
 }

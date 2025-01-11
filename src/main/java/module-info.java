@@ -1,6 +1,7 @@
 module lab06 {
     requires javafx.fxml;
     requires javafx.controls;
+    requires java.sql;
 
     opens org.wilczewski.retentionbasin to javafx.fxml;
     opens org.wilczewski.riversection to javafx.fxml;

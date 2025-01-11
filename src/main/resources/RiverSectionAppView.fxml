@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
-
 
 <AnchorPane prefHeight="760.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.wilczewski.riversection.RiverSectionController">
    <children>
@@ -21,5 +22,26 @@
             <Font size="19.0" />
          </font>
       </Button>
+      <Rectangle fx:id="activeRiverSign" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="632.0" layoutX="68.0" layoutY="64.0" stroke="BLACK" strokeType="INSIDE" visible="false" width="33.0" />
+      <Label layoutX="122.0" layoutY="325.0" prefHeight="38.0" prefWidth="76.0" text="Rainfall:">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+      <Label layoutX="122.0" layoutY="380.0" prefHeight="38.0" prefWidth="201.0" text="Water from retention basin:">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+      <Label fx:id="rainfallTxtLabel" layoutX="198.0" layoutY="325.0" prefHeight="38.0" prefWidth="76.0">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+      <Label fx:id="inflowWaterTxtLabel" layoutX="314.0" layoutY="380.0" prefHeight="38.0" prefWidth="76.0">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

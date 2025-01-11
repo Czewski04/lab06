@@ -9,7 +9,7 @@ import javafx.scene.control.TextField;
 
 import java.io.IOException;
 
-public class RetnetionBasinController {
+public class RetentionBasinController {
     @FXML
     public Label valueTxtLabel;
     @FXML
@@ -30,6 +30,12 @@ public class RetnetionBasinController {
     public TextField outRiverHostTxtField;
     @FXML
     public ProgressBar volumeProgressBar;
+    @FXML
+    public Label outflowTxtLabel;
+    @FXML
+    public Label inflowTxtLabel;
+    @FXML
+    public Label fillingPercentageTxtLabel;
 
     RetentionBasinService retentionBasinService;
 
@@ -91,7 +97,13 @@ public class RetnetionBasinController {
 
     public void updateVolume(double fillPercentage) {
         volumeProgressBar.setProgress(fillPercentage);
+        fillPercentage *= 100;
+        fillingPercentageTxtLabel.setText(String.valueOf(fillPercentage)+"%");
     }
 
+    public void updateFlow(int inflow, int outflow) {
+        outflowTxtLabel.setText(String.valueOf(outflow));
+        inflowTxtLabel.setText(String.valueOf(inflow));
+    }
 
 }

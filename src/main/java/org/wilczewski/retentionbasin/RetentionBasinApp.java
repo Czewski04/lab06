@@ -7,7 +7,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 public class RetentionBasinApp extends Application {
     public static void main(String[] args) throws IOException, InterruptedException {
@@ -24,7 +23,7 @@ public class RetentionBasinApp extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/RetentionBasinAppView.fxml"));
         Parent root = loader.load();
 
-        RetnetionBasinController controller = loader.getController();
+        RetentionBasinController controller = loader.getController();
         RetentionBasinService retentionBasinService = new RetentionBasinService(controller);
         controller.setRetentionBasinService(retentionBasinService);
 

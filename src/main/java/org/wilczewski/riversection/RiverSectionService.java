@@ -1,5 +1,7 @@
 package org.wilczewski.riversection;
 
+import javafx.application.Platform;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -18,9 +20,9 @@ public class RiverSectionService implements IRiverSection {
     private String inBasinHost;
     private int outBasinPort;
     private String outBasinHost;
-    private int waterInflow;
     private int waterOutflow;
     private int rainfall;
+    private int realDischarge;
 
     RiverSectionController controller;
 
@@ -40,14 +42,16 @@ public class RiverSectionService implements IRiverSection {
         startServer();
     }
 
-    public void run() throws IOException, InterruptedException {
-        //sendRiverSectionData(environmentHost, environmentPort);
+    public void run() throws IOException {
+        sendRiverSectionData(environmentHost, environmentPort);
         sendRiverSectionData(inBasinHost, inBasinPort);
         Thread thread = new Thread(() -> {
             while(true) {
                 try {
                     TimeUnit.SECONDS.sleep(5);
-                } catch (InterruptedException e) {
+                    calculateOutflow();
+                    sendWaterDischarge(waterOutflow);
+                } catch (InterruptedException | IOException e) {
                     throw new RuntimeException(e);
                 }
                 System.out.println("basin running");
@@ -56,14 +60,35 @@ public class RiverSectionService implements IRiverSection {
         thread.start();
     }
 
-    @Override
-    public void setRealDischarge(int realDischarge) {
-        this.waterInflow = realDischarge;
+    public void calculateOutflow() {
+        waterOutflow = 0;
+        waterOutflow = realDischarge + rainfall;
+        if(waterOutflow>0) Platform.runLater(() -> controller.showActiveRiverSign());
+    }
+
+    public void showRainfall(int rainfall) {
+        Platform.runLater(()->controller.showRainfall(rainfall));
+    }
+
+    public void showWaterInflow(int waterInflow) {
+        Platform.runLater(()->controller.showInflowWater(waterInflow));
     }
 
     @Override
-    public void setRainfall(int rainfall) {
+    public void setRealDischarge(int realDischarge) {
+        try {
+            TimeUnit.SECONDS.sleep((long) delay);
+            this.realDischarge = realDischarge;
+            showWaterInflow(realDischarge);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void setRainfall(int rainfall) throws IOException {
         this.rainfall = rainfall;
+        showRainfall(rainfall);
     }
 
     @Override
@@ -78,8 +103,8 @@ public class RiverSectionService implements IRiverSection {
         startClient(host, port, message);
     }
 
-    public void sendWaterDischarge() throws IOException {
-        String message = "swi:"+waterInflow;
+    public void sendWaterDischarge(int waterDischarge) throws IOException {
+        String message = "swi:"+waterDischarge+","+ownPort;
         startClient(outBasinHost, outBasinPort, message);
     }
 
@@ -120,7 +145,7 @@ public class RiverSectionService implements IRiverSection {
         }
     }
 
-    public void handleRequest(String request){
+    public void handleRequest(String request) throws IOException {
         System.out.println(request);
         if(request.startsWith("srd:")){
             int discharge = Integer.parseInt(request.substring(4));

@@ -19,55 +19,69 @@ public class RetentionBasinService implements IRetentionBasin{
     private int centralPort;
     private String centralHost;
     private int waterDischarge;
-    private int waterInflow;
+    private int realWaterInflow;
     private double fillingPercentage;
     private String outRiverSectionHost;
     private int outRiverSectionPort;
     private ConcurrentHashMap<Integer, Integer> inRiverSections;
-    private RetnetionBasinController controller;
+    private String inRiverSectionHost;
+    private int inRiverSectionPort;
+    private RetentionBasinController controller;
 
-    public RetentionBasinService(RetnetionBasinController controller) {
+    public RetentionBasinService(RetentionBasinController controller) {
         this.controller = controller;
     }
 
-    public void configuration(int volume, int ownPort, String ownHost, int centralPort, String centralHost, int outRiverSectionPort, String outRiverSectionHost) throws IOException, InterruptedException {
+    public void configuration(int volume, int ownPort, String ownHost, int centralPort, String centralHost, int inRiverSectionPort, String inRiverSectionHost) throws IOException, InterruptedException {
         this.maxVolume = volume;
         this.ownPort = ownPort;
         this.ownHost = ownHost;
         this.centralPort = centralPort;
         this.centralHost = centralHost;
-        this.outRiverSectionHost = outRiverSectionHost;
-        this.outRiverSectionPort = outRiverSectionPort;
         this.inRiverSections = new ConcurrentHashMap<>();
-        this.volume = 400;
-        this.waterDischarge = 30;
+        this.inRiverSectionHost = inRiverSectionHost;
+        this.inRiverSectionPort = inRiverSectionPort;
+        inRiverSections.put(inRiverSectionPort, 0);
         startServer();
     }
 
     public void run() throws IOException, InterruptedException {
         sendRetentionBasinData(centralHost, centralPort);
-        //sendRetentionBasinData(outRiverSectionHost, outRiverSectionPort);
+        sendRetentionBasinData(inRiverSectionHost, inRiverSectionPort);
         Thread thread = new Thread(() -> {
             while(true) {
                 try {
                     TimeUnit.SECONDS.sleep(5);
-                } catch (InterruptedException e) {
+                    sendWaterDischarge();
+                } catch (InterruptedException | IOException e) {
                     throw new RuntimeException(e);
                 }
-//                sendWaterDischarge();
-//                updateFillingPercentageBar();
+                calculateAmountOfWater();
+                updateFillingPercentageBar();
+                updateFlowDisplay();
                 System.out.println("basin running");
             }
         });
         thread.start();
     }
 
-    public void updateFillingPercentageBar(){
-        Thread updateSimulationView = new Thread(() -> {
-            Platform.runLater(()-> controller.updateVolume(fillingPercentage));
+    public void calculateAmountOfWater(){
+        realWaterInflow = 0;
+        inRiverSections.forEach((port, water) -> {
+            realWaterInflow += water;
         });
-        updateSimulationView.setDaemon(true);
-        updateSimulationView.start();
+        volume += realWaterInflow - waterDischarge;
+        if(volume<0) volume = waterDischarge = 0;
+        fillingPercentage = (double)volume/(double)maxVolume;
+        if(fillingPercentage >= 1) waterDischarge = realWaterInflow;
+    }
+
+    public void updateFlowDisplay(){
+        Platform.runLater(()-> controller.updateFlow(realWaterInflow, waterDischarge));
+    }
+
+    public void updateFillingPercentageBar(){
+        Platform.runLater(()-> controller.updateVolume(fillingPercentage));
     }
 
     @Override
@@ -78,22 +92,17 @@ public class RetentionBasinService implements IRetentionBasin{
     @Override
     public double getFillingPercentage() {
         fillingPercentage = (double)volume/(double)maxVolume;
-        System.out.println(volume);
-        System.out.println(maxVolume);
-        System.out.println(fillingPercentage);
         return fillingPercentage;
     }
 
     @Override
     public void setWaterDischarge(int waterDischarge) {
         this.waterDischarge = waterDischarge;
-        this.waterInflow -= waterDischarge;
     }
 
     @Override
     public void setWaterInflow(int waterInflow, int port) {
         inRiverSections.put(port, waterInflow);
-        this.waterInflow += waterInflow;
     }
 
     @Override

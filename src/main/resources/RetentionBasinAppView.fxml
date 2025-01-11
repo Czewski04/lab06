@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="760.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.wilczewski.retentionbasin.RetnetionBasinController">
+<AnchorPane prefHeight="760.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.wilczewski.retentionbasin.RetentionBasinController">
    <children>
       <Button fx:id="configurationButton" layoutX="900.0" layoutY="130.0" mnemonicParsing="false" onAction="#setNetworkConfig" text="Set configuration" />
       <TextField fx:id="ownHostTxtField" layoutX="512.0" layoutY="53.0" promptText="this host" />
@@ -26,12 +26,37 @@
       <TextField fx:id="maxVolumeTxtField" layoutX="701.0" layoutY="103.0" promptText="max volume" />
       <TextField fx:id="CentralControlHostTxtField" layoutX="512.0" layoutY="154.0" promptText="central control host" />
       <TextField fx:id="CentralControlPortTxtField" layoutX="700.0" layoutY="154.0" promptText="central control port" />
-      <TextField fx:id="outRiverPortTxtField" layoutX="701.0" layoutY="208.0" promptText="out river port" />
-      <TextField fx:id="outRiverHostTxtField" layoutX="512.0" layoutY="208.0" promptText="out river host" />
+      <TextField fx:id="outRiverPortTxtField" layoutX="701.0" layoutY="208.0" promptText="in river port" />
+      <TextField fx:id="outRiverHostTxtField" layoutX="512.0" layoutY="208.0" promptText="in river host" />
       <Button layoutX="664.0" layoutY="596.0" mnemonicParsing="false" onAction="#startWorking" prefHeight="65.0" prefWidth="223.0" text="Start working">
          <font>
             <Font size="19.0" />
          </font>
       </Button>
+      <Label layoutX="432.0" layoutY="356.0" prefHeight="47.0" prefWidth="98.0" text="Inflow now:">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+      <Label layoutX="432.0" layoutY="416.0" prefHeight="47.0" prefWidth="98.0" text="Outflow now:">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+      <Label fx:id="outflowTxtLabel" layoutX="540.0" layoutY="416.0" prefHeight="47.0" prefWidth="76.0">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+      <Label fx:id="inflowTxtLabel" layoutX="540.0" layoutY="356.0" prefHeight="47.0" prefWidth="76.0">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+      <Label fx:id="fillingPercentageTxtLabel" layoutX="188.0" layoutY="677.0" prefHeight="54.0" prefWidth="122.0">
+         <font>
+            <Font size="25.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

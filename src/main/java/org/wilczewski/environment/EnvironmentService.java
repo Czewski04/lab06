@@ -1,5 +1,7 @@
 package org.wilczewski.environment;
 
+import javafx.application.Platform;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -7,16 +9,38 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class EnvironmentService implements IEnvironment{
     private int ownPort;
     private String ownHost;
     private ConcurrentHashMap<Integer, String> riverSectionsMap;
+    private EnvironmentController controller;
 
-    public EnvironmentService(int ownPort, String ownHost) {
+    public EnvironmentService(EnvironmentController controller) {
+        this.controller = controller;
+    }
+
+    public void configuration(int ownPort, String ownHost) throws IOException {
         this.ownPort = ownPort;
         this.ownHost = ownHost;
         riverSectionsMap = new ConcurrentHashMap<>();
+        startServer();
+    }
+
+    public void run(){
+        Thread thread = new Thread(() -> {
+            while(true) {
+                try {
+                    TimeUnit.SECONDS.sleep(5);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                Platform.runLater(()->controller.showRivers(riverSectionsMap));
+                System.out.println("control center running");
+            }
+        });
+        thread.start();
     }
 
     @Override
