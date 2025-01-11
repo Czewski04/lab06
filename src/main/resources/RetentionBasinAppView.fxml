@@ -7,12 +7,12 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="764.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.wilczewski.retentionbasin.RetnetionBasinController">
+<AnchorPane prefHeight="760.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.wilczewski.retentionbasin.RetnetionBasinController">
    <children>
       <Button fx:id="configurationButton" layoutX="900.0" layoutY="130.0" mnemonicParsing="false" onAction="#setNetworkConfig" text="Set configuration" />
       <TextField fx:id="ownHostTxtField" layoutX="512.0" layoutY="53.0" promptText="this host" />
       <TextField fx:id="ownPortTxtField" layoutX="700.0" layoutY="53.0" promptText="this port" />
-      <ProgressBar layoutX="-10.0" layoutY="233.0" prefHeight="338.0" prefWidth="519.0" progress="0.0" rotate="270.0" />
+      <ProgressBar fx:id="volumeProgressBar" layoutX="-10.0" layoutY="233.0" prefHeight="338.0" prefWidth="519.0" progress="0.0" rotate="270.0" />
       <Label layoutX="92.0" layoutY="98.0" prefHeight="36.0" prefWidth="122.0" text="Max basin volume: ">
          <font>
             <Font size="14.0" />

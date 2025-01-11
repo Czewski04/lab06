@@ -1,13 +1,15 @@
 package org.wilczewski.retentionbasin;
 
+import javafx.application.Platform;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class RetentionBasinService implements IRetentionBasin{
     private int maxVolume;
@@ -18,12 +20,16 @@ public class RetentionBasinService implements IRetentionBasin{
     private String centralHost;
     private int waterDischarge;
     private int waterInflow;
-    private long fillingPercentage;
+    private double fillingPercentage;
     private String outRiverSectionHost;
     private int outRiverSectionPort;
     private ConcurrentHashMap<Integer, Integer> inRiverSections;
+    RetnetionBasinController controller;
+    public RetentionBasinService(RetnetionBasinController controller) {
+        this.controller = controller;
+    }
 
-    public RetentionBasinService(int volume, int ownPort, String ownHost, int centralPort, String centralHost, int outRiverSectionPort, String outRiverSectionHost) throws IOException {
+    public void configuration(int volume, int ownPort, String ownHost, int centralPort, String centralHost, int outRiverSectionPort, String outRiverSectionHost) throws IOException, InterruptedException {
         this.volume = volume;
         this.ownPort = ownPort;
         this.ownHost = ownHost;
@@ -35,10 +41,30 @@ public class RetentionBasinService implements IRetentionBasin{
         startServer();
     }
 
-    public void run(){
-        while(true){
+    public void run() throws IOException, InterruptedException {
+        //sendRetentionBasinData(centralHost, centralPort);
+        sendRetentionBasinData(outRiverSectionHost, outRiverSectionPort);
+        Thread thread = new Thread(() -> {
+            while(true) {
+                try {
+                    TimeUnit.SECONDS.sleep(5);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+//                sendWaterDischarge();
+//                updateFillingPercentageBar();
+                System.out.println("basin running");
+            }
+        });
+        thread.start();
+    }
 
-        }
+    public void updateFillingPercentageBar(){
+        Thread updateSimulationView = new Thread(() -> {
+            Platform.runLater(()-> controller.updateVolume(fillingPercentage));
+        });
+        updateSimulationView.setDaemon(true);
+        updateSimulationView.start();
     }
 
     @Override
@@ -47,8 +73,8 @@ public class RetentionBasinService implements IRetentionBasin{
     }
 
     @Override
-    public long getFillingPercentage() {
-        fillingPercentage = (long)(volume/maxVolume);
+    public double getFillingPercentage() {
+        fillingPercentage = (float)(volume/maxVolume);
         return fillingPercentage;
     }
 
@@ -68,6 +94,7 @@ public class RetentionBasinService implements IRetentionBasin{
     public void assignRiverSection(int port, String host) {
         this.outRiverSectionHost = host;
         this.outRiverSectionPort = port;
+        System.out.println("river section assigned");
     }
 
     public void sendWaterDischarge() throws IOException {
@@ -99,7 +126,7 @@ public class RetentionBasinService implements IRetentionBasin{
         Thread thread = new Thread(() -> {
             try (Socket clientSocket = new Socket(host, port);
                  PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true)){
-                    writer.println(message);
+                writer.println(message);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -144,7 +171,7 @@ public class RetentionBasinService implements IRetentionBasin{
             String host = parts[1];
             assignRiverSection(port, host);
         }
-        return "Error";
+        return "ok";
     }
 
 }

@@ -24,6 +24,10 @@ public class RetentionBasinApp extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/RetentionBasinAppView.fxml"));
         Parent root = loader.load();
 
+        RetnetionBasinController controller = loader.getController();
+        RetentionBasinService retentionBasinService = new RetentionBasinService(controller);
+        controller.setRetentionBasinService(retentionBasinService);
+
         stage.setTitle("Retention Basin");
         stage.setScene(new Scene(root));
         stage.show();

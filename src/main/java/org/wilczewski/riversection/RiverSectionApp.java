@@ -24,6 +24,11 @@ public class RiverSectionApp extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/RiverSectionAppView.fxml"));
         Parent root = loader.load();
 
+        RiverSectionController controller = loader.getController();
+        RiverSectionService riverSectionService = new RiverSectionService(controller);
+        controller.setRiverSectionService(riverSectionService);
+
+
         stage.setTitle("River Section");
         stage.setScene(new Scene(root));
         stage.show();

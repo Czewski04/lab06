@@ -6,13 +6,14 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.TimeUnit;
 
 public class RiverSectionService implements IRiverSection {
     private float delay;
     private int ownPort;
     private String ownHost;
     private int environmentPort;
-    private String environmentBasinHost;
+    private String environmentHost;
     private int inBasinPort;
     private String inBasinHost;
     private int outBasinPort;
@@ -21,10 +22,38 @@ public class RiverSectionService implements IRiverSection {
     private int waterOutflow;
     private int rainfall;
 
-    public RiverSectionService(float delay, int ownPort, String ownHost) {
+    RiverSectionController controller;
+
+    public RiverSectionService(RiverSectionController controller) {
+        this.controller = controller;
+    }
+
+
+    public void configuration(float delay, int ownPort, String ownHost, int environmentPort, String environmentBasinHost, int inBasinPort, String inBasinHost) throws IOException {
         this.delay = delay;
         this.ownPort = ownPort;
         this.ownHost = ownHost;
+        this.environmentPort = environmentPort;
+        this.environmentHost = environmentBasinHost;
+        this.inBasinPort = inBasinPort;
+        this.inBasinHost = inBasinHost;
+        startServer();
+    }
+
+    public void run() throws IOException, InterruptedException {
+        //sendRiverSectionData(environmentHost, environmentPort);
+        sendRiverSectionData(inBasinHost, inBasinPort);
+        Thread thread = new Thread(() -> {
+            while(true) {
+                try {
+                    TimeUnit.SECONDS.sleep(5);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                System.out.println("basin running");
+            }
+        });
+        thread.start();
     }
 
     @Override
@@ -41,6 +70,7 @@ public class RiverSectionService implements IRiverSection {
     public void assignsRetentionBasin(int port, String host) {
         this.outBasinHost = host;
         this.outBasinPort = port;
+        System.out.println("retention basin assigned");
     }
 
     public void sendRiverSectionData(String host, int port) throws IOException {
