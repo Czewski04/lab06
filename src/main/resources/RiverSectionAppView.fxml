@@ -12,8 +12,8 @@
       <TextField fx:id="ownHostTxtField" layoutX="540.0" layoutY="65.0" promptText="this host" />
       <TextField fx:id="ownPortTxtField" layoutX="728.0" layoutY="65.0" promptText="this port" />
       <TextField fx:id="riverDelayTxtField" layoutX="729.0" layoutY="115.0" promptText="river delay" />
-      <TextField fx:id="environmentHostTxtField" layoutX="540.0" layoutY="166.0" promptText="envirionment host" />
-      <TextField fx:id="environmentPortTxtField" layoutX="728.0" layoutY="166.0" promptText="envirionment port" />
+      <TextField fx:id="environmentHostTxtField" layoutX="540.0" layoutY="166.0" promptText="environment host" />
+      <TextField fx:id="environmentPortTxtField" layoutX="728.0" layoutY="166.0" promptText="environment port" />
       <TextField fx:id="inBasinPortTxtField" layoutX="729.0" layoutY="220.0" promptText="in basin port" />
       <TextField fx:id="inBasinHostTxtField" layoutX="540.0" layoutY="220.0" promptText="in basin host" />
       <Button layoutX="692.0" layoutY="608.0" mnemonicParsing="false" onAction="#startWorking" prefHeight="65.0" prefWidth="223.0" text="Start working">

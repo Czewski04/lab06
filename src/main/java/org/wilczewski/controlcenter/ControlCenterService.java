@@ -1,40 +1,76 @@
 package org.wilczewski.controlcenter;
 
+import javafx.application.Platform;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class ControlCenterService implements IControlerCenter{
-    private ConcurrentHashMap<Integer, String> retentionBasinsMap;
+    private ConcurrentHashMap<Integer, RetentionBasinMapItem> retentionBasinsMap;
     private int ownPort;
     private String ownHost;
+    private ControlCenterController controller;
 
-    public ControlCenterService(int ownPort, String ownHost) {
+    public ControlCenterService(ControlCenterController controller) {
+        this.controller = controller;
+    }
+
+    public void configuration(int ownPort, String ownHost) throws IOException {
         this.ownPort = ownPort;
         this.ownHost = ownHost;
         retentionBasinsMap = new ConcurrentHashMap<>();
+        startServer();
+    }
+
+    public void run() throws IOException, InterruptedException {
+        Thread thread = new Thread(() -> {
+            while(true) {
+                try {
+                    TimeUnit.SECONDS.sleep(5);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                retentionBasinsMap.forEach((port, mapItem) -> {
+                    try {
+                        getRetentionBasinFillingPercentage(port, mapItem.getHost());
+                        getRetentionBasinWaterDischarge(port, mapItem.getHost());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                Platform.runLater(()->controller.showBasins(retentionBasinsMap));
+                System.out.println("control center running");
+            }
+        });
+        thread.start();
     }
 
     @Override
-    public void assignRetentionBasin(int port, String host) {
-        retentionBasinsMap.put(port, host);
+    public void assignRetentionBasin(int port, String host) throws IOException {
+        retentionBasinsMap.put(port, new RetentionBasinMapItem(host));
+        getRetentionBasinWaterDischarge(port, host);
+        getRetentionBasinFillingPercentage(port, host);
+
         System.out.println("Dodano zbiornik do centrali" + host + " " + port);
 
     }
 
     public void getRetentionBasinFillingPercentage(int port, String host) throws IOException {
         String message = "gfp:";
-        startClient(host,port,message).thenAccept(System.out::println);
+        startClient(host,port,message).thenAccept(response -> {retentionBasinsMap.get(port).setFillingPercentage(Double.parseDouble(response));});
     }
 
     public void getRetentionBasinWaterDischarge(int port, String host) throws IOException {
         String message = "gwd:";
-        startClient(host,port,message).thenAccept(System.out::println);
+        startClient(host,port,message).thenAccept(response -> {retentionBasinsMap.get(port).setWaterDischargeValve(Integer.parseInt(response));});
     }
 
     public void setRetentionBasinWaterDischarge(int port, String host, int waterDischarge) throws IOException {
@@ -84,7 +120,7 @@ public class ControlCenterService implements IControlerCenter{
         }
     }
 
-    public void handleRequest(String request){
+    public void handleRequest(String request) throws IOException {
         if(request.startsWith("arb:")){
             String[] parts = request.substring(4).split(",");
             int port = Integer.parseInt(parts[0]);

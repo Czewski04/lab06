@@ -24,13 +24,14 @@ public class RetentionBasinService implements IRetentionBasin{
     private String outRiverSectionHost;
     private int outRiverSectionPort;
     private ConcurrentHashMap<Integer, Integer> inRiverSections;
-    RetnetionBasinController controller;
+    private RetnetionBasinController controller;
+
     public RetentionBasinService(RetnetionBasinController controller) {
         this.controller = controller;
     }
 
     public void configuration(int volume, int ownPort, String ownHost, int centralPort, String centralHost, int outRiverSectionPort, String outRiverSectionHost) throws IOException, InterruptedException {
-        this.volume = volume;
+        this.maxVolume = volume;
         this.ownPort = ownPort;
         this.ownHost = ownHost;
         this.centralPort = centralPort;
@@ -38,12 +39,14 @@ public class RetentionBasinService implements IRetentionBasin{
         this.outRiverSectionHost = outRiverSectionHost;
         this.outRiverSectionPort = outRiverSectionPort;
         this.inRiverSections = new ConcurrentHashMap<>();
+        this.volume = 400;
+        this.waterDischarge = 30;
         startServer();
     }
 
     public void run() throws IOException, InterruptedException {
-        //sendRetentionBasinData(centralHost, centralPort);
-        sendRetentionBasinData(outRiverSectionHost, outRiverSectionPort);
+        sendRetentionBasinData(centralHost, centralPort);
+        //sendRetentionBasinData(outRiverSectionHost, outRiverSectionPort);
         Thread thread = new Thread(() -> {
             while(true) {
                 try {
@@ -74,7 +77,10 @@ public class RetentionBasinService implements IRetentionBasin{
 
     @Override
     public double getFillingPercentage() {
-        fillingPercentage = (float)(volume/maxVolume);
+        fillingPercentage = (double)volume/(double)maxVolume;
+        System.out.println(volume);
+        System.out.println(maxVolume);
+        System.out.println(fillingPercentage);
         return fillingPercentage;
     }
 
