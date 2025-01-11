@@ -23,11 +23,22 @@ public class RetentionBasinService implements IRetentionBasin{
     private int outRiverSectionPort;
     private ConcurrentHashMap<Integer, Integer> inRiverSections;
 
-    public RetentionBasinService(int volume, int ownPort, String ownHost) {
+    public RetentionBasinService(int volume, int ownPort, String ownHost, int centralPort, String centralHost, int outRiverSectionPort, String outRiverSectionHost) throws IOException {
         this.volume = volume;
         this.ownPort = ownPort;
         this.ownHost = ownHost;
+        this.centralPort = centralPort;
+        this.centralHost = centralHost;
+        this.outRiverSectionHost = outRiverSectionHost;
+        this.outRiverSectionPort = outRiverSectionPort;
         this.inRiverSections = new ConcurrentHashMap<>();
+        startServer();
+    }
+
+    public void run(){
+        while(true){
+
+        }
     }
 
     @Override

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="764.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.wilczewski.retentionbasin.RetnetionBasinController">
+   <children>
+      <Button fx:id="configurationButton" layoutX="900.0" layoutY="130.0" mnemonicParsing="false" onAction="#setNetworkConfig" text="Set configuration" />
+      <TextField fx:id="ownHostTxtField" layoutX="512.0" layoutY="53.0" promptText="this host" />
+      <TextField fx:id="ownPortTxtField" layoutX="700.0" layoutY="53.0" promptText="this port" />
+      <ProgressBar layoutX="-10.0" layoutY="233.0" prefHeight="338.0" prefWidth="519.0" progress="0.0" rotate="270.0" />
+      <Label layoutX="92.0" layoutY="98.0" prefHeight="36.0" prefWidth="122.0" text="Max basin volume: ">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label fx:id="valueTxtLabel" layoutX="221.0" layoutY="98.0" prefHeight="36.0" prefWidth="76.0">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <TextField fx:id="maxVolumeTxtField" layoutX="701.0" layoutY="103.0" promptText="max volume" />
+      <TextField fx:id="CentralControlHostTxtField" layoutX="512.0" layoutY="154.0" promptText="central control host" />
+      <TextField fx:id="CentralControlPortTxtField" layoutX="700.0" layoutY="154.0" promptText="central control port" />
+      <TextField fx:id="outRiverPortTxtField" layoutX="701.0" layoutY="208.0" promptText="out river port" />
+      <TextField fx:id="outRiverHostTxtField" layoutX="512.0" layoutY="208.0" promptText="out river host" />
+      <Button layoutX="664.0" layoutY="596.0" mnemonicParsing="false" onAction="#startWorking" prefHeight="65.0" prefWidth="223.0" text="Start working">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>
