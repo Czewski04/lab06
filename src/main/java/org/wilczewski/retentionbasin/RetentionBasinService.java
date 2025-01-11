@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -23,31 +24,34 @@ public class RetentionBasinService implements IRetentionBasin{
     private double fillingPercentage;
     private String outRiverSectionHost;
     private int outRiverSectionPort;
-    private ConcurrentHashMap<Integer, Integer> inRiverSections;
-    private String inRiverSectionHost;
-    private int inRiverSectionPort;
+    private ConcurrentHashMap<Integer, Integer> inRiverSectionsWaterInflow;
+    private ConcurrentHashMap<Integer, String> inRiverSections;
     private RetentionBasinController controller;
 
     public RetentionBasinService(RetentionBasinController controller) {
         this.controller = controller;
+        this.inRiverSectionsWaterInflow = new ConcurrentHashMap<>();
     }
 
-    public void configuration(int volume, int ownPort, String ownHost, int centralPort, String centralHost, int inRiverSectionPort, String inRiverSectionHost) throws IOException, InterruptedException {
+    public void configuration(int volume, int ownPort, String ownHost, int centralPort, String centralHost, Map<Integer, String> inRiverSections) throws IOException, InterruptedException {
         this.maxVolume = volume;
         this.ownPort = ownPort;
         this.ownHost = ownHost;
         this.centralPort = centralPort;
         this.centralHost = centralHost;
-        this.inRiverSections = new ConcurrentHashMap<>();
-        this.inRiverSectionHost = inRiverSectionHost;
-        this.inRiverSectionPort = inRiverSectionPort;
-        inRiverSections.put(inRiverSectionPort, 0);
+        this.inRiverSections = new ConcurrentHashMap<>(inRiverSections);
         startServer();
     }
 
     public void run() throws IOException, InterruptedException {
         sendRetentionBasinData(centralHost, centralPort);
-        sendRetentionBasinData(inRiverSectionHost, inRiverSectionPort);
+        inRiverSections.forEach((port, host) -> {
+            try {
+                sendRetentionBasinData(host, port);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
         Thread thread = new Thread(() -> {
             while(true) {
                 try {
@@ -59,7 +63,6 @@ public class RetentionBasinService implements IRetentionBasin{
                 calculateAmountOfWater();
                 updateFillingPercentageBar();
                 updateFlowDisplay();
-                System.out.println("basin running");
             }
         });
         thread.start();
@@ -67,7 +70,7 @@ public class RetentionBasinService implements IRetentionBasin{
 
     public void calculateAmountOfWater(){
         realWaterInflow = 0;
-        inRiverSections.forEach((port, water) -> {
+        inRiverSectionsWaterInflow.forEach((port, water) -> {
             realWaterInflow += water;
         });
         volume += realWaterInflow - waterDischarge;
@@ -102,14 +105,13 @@ public class RetentionBasinService implements IRetentionBasin{
 
     @Override
     public void setWaterInflow(int waterInflow, int port) {
-        inRiverSections.put(port, waterInflow);
+        inRiverSectionsWaterInflow.put(port, waterInflow);
     }
 
     @Override
     public void assignRiverSection(int port, String host) {
         this.outRiverSectionHost = host;
         this.outRiverSectionPort = port;
-        System.out.println("river section assigned");
     }
 
     public void sendWaterDischarge() throws IOException {
@@ -163,7 +165,6 @@ public class RetentionBasinService implements IRetentionBasin{
     }
 
     public String handleRequest(String request){
-        System.out.println(request);
         if(request.startsWith("gwd")){
             return String.valueOf(getWaterDischarge());
         }

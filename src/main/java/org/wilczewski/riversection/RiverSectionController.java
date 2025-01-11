@@ -4,10 +4,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.shape.Rectangle;
-import org.wilczewski.retentionbasin.RetentionBasinService;
 
 import java.io.IOException;
 

@@ -11,11 +11,6 @@ import java.io.IOException;
 public class RetentionBasinApp extends Application {
     public static void main(String[] args) throws IOException, InterruptedException {
         launch(args);
-//        RetentionBasinService rBasin = new RetentionBasinService(1000, 400, "localhost");
-//        rBasin.startServer();
-//        TimeUnit.SECONDS.sleep(5);
-//        rBasin.sendRetentionBasinData("localhost", 500);
-//        rBasin.sendRetentionBasinData("localhost", 999);
     }
 
     @Override

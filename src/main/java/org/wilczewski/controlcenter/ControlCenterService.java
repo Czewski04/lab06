@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -30,7 +29,7 @@ public class ControlCenterService implements IControlerCenter{
         startServer();
     }
 
-    public void run() throws IOException, InterruptedException {
+    public void run() {
         Thread thread = new Thread(() -> {
             while(true) {
                 try {

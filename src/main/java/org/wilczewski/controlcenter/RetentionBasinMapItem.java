@@ -3,7 +3,7 @@ package org.wilczewski.controlcenter;
 public class RetentionBasinMapItem {
     private String host;
     private double fillingPercentage;
-    private int waterDischargeValve; // procentowe otwarcie spustu
+    private int waterDischargeValve;
 
     public RetentionBasinMapItem(String host) {
         this.host = host;

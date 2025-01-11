@@ -9,11 +9,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class EnvironmentApp extends Application {
-    public static void main(String[] args) throws IOException, InterruptedException {
-//        EnvironmentService environmentService = new EnvironmentService(998, "localhost");
-//        environmentService.startServer();
-//        TimeUnit.SECONDS.sleep(5);
-//        environmentService.setRainfall(500, "localhost", 100);
+    public static void main(String[] args) {
         launch(args);
     }
 

@@ -1,13 +1,15 @@
 package org.wilczewski.retentionbasin;
 
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.util.converter.IntegerStringConverter;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RetentionBasinController {
     @FXML
@@ -25,9 +27,9 @@ public class RetentionBasinController {
     @FXML
     public TextField CentralControlPortTxtField;
     @FXML
-    public TextField outRiverPortTxtField;
+    public TextField inRiverPortTxtField;
     @FXML
-    public TextField outRiverHostTxtField;
+    public TextField inRiverHostTxtField;
     @FXML
     public ProgressBar volumeProgressBar;
     @FXML
@@ -36,8 +38,39 @@ public class RetentionBasinController {
     public Label inflowTxtLabel;
     @FXML
     public Label fillingPercentageTxtLabel;
+    @FXML
+    public TableView<RiversSectionEntryItem> riversSectionTableView;
+    @FXML
+    public TableColumn<RiversSectionEntryItem, String> hostRiverSectionCollumnView;
+    @FXML
+    public TableColumn<RiversSectionEntryItem, Integer> portRiverSectionCollumnView;
+
 
     RetentionBasinService retentionBasinService;
+
+    @FXML
+    private void initialize() {
+        hostRiverSectionCollumnView.setCellValueFactory(cellData -> cellData.getValue().hostProperty());
+        hostRiverSectionCollumnView.setCellFactory(TextFieldTableCell.forTableColumn());
+        hostRiverSectionCollumnView.setOnEditCommit(event -> {
+            RiversSectionEntryItem item = event.getRowValue();
+            item.setHost(event.getNewValue());
+        });
+
+        portRiverSectionCollumnView.setCellValueFactory(cellData -> cellData.getValue().portProperty().asObject());
+        portRiverSectionCollumnView.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+        portRiverSectionCollumnView.setOnEditCommit(event -> {
+            RiversSectionEntryItem item = event.getRowValue();
+            item.setPort(event.getNewValue());
+        });
+
+        riversSectionTableView.setEditable(true);
+
+        riversSectionTableView.setItems(FXCollections.observableArrayList());
+    }
+
+
+
 
     public void setRetentionBasinService(RetentionBasinService retentionBasinService) {
         this.retentionBasinService = retentionBasinService;
@@ -66,16 +99,19 @@ public class RetentionBasinController {
             String centralHost = CentralControlHostTxtField.getText();
             if(centralHost.isEmpty()) throw new IllegalArgumentException("Central control port cannot be empty");
 
-            String outRiverSectionHost = outRiverHostTxtField.getText();
-            if(outRiverSectionHost.isEmpty()) throw new IllegalArgumentException("Out river port cannot be empty");
+            Map<Integer, String> inRiverSections = new HashMap<>();
+            for (RiversSectionEntryItem entry : riversSectionTableView.getItems()) {
+                String host = entry.getHost();
+                int port = entry.getPort();
 
-            String outRiverSectionPortStr = outRiverPortTxtField.getText();
-            if(outRiverSectionPortStr.isEmpty()) throw new IllegalArgumentException("Out river port cannot be empty");
-            int outRiverSectionPort = Integer.parseInt(outRiverSectionPortStr);
-            if(outRiverSectionPort < 0) throw new IllegalArgumentException("Out river port cannot be negative");
+                if (host == null || host.isEmpty()) throw new IllegalArgumentException("River section host cannot be empty");
+                if (port <= 0) throw new IllegalArgumentException("River section port must be positive");
+
+                inRiverSections.put(port, host);
+            }
 
             configurationButton.setDisable(true);
-            this.retentionBasinService.configuration(maxVolume, ownPort, ownHost, centralPort, centralHost, outRiverSectionPort, outRiverSectionHost);
+            this.retentionBasinService.configuration(maxVolume, ownPort, ownHost, centralPort, centralHost, inRiverSections);
             showMaxVolume(maxVolume);
         }
         catch (IllegalArgumentException e) {
@@ -105,5 +141,25 @@ public class RetentionBasinController {
         outflowTxtLabel.setText(String.valueOf(outflow));
         inflowTxtLabel.setText(String.valueOf(inflow));
     }
+
+    @FXML
+    private void addRow(ActionEvent actionEvent) {
+        String inRiverSectionHost = inRiverHostTxtField.getText();
+        if(inRiverSectionHost.isEmpty()) throw new IllegalArgumentException("In river port cannot be empty");
+
+        String inRiverSectionPortStr = inRiverPortTxtField.getText();
+        if(inRiverSectionPortStr.isEmpty()) throw new IllegalArgumentException("In river port cannot be empty");
+        int inRiverSectionPort = Integer.parseInt(inRiverSectionPortStr);
+        if(inRiverSectionPort < 0) throw new IllegalArgumentException("In river port cannot be negative");
+
+
+        RiversSectionEntryItem newItem = new RiversSectionEntryItem(inRiverSectionHost, inRiverSectionPort);
+
+        inRiverHostTxtField.clear();
+        inRiverPortTxtField.clear();
+
+        riversSectionTableView.getItems().add(newItem);
+    }
+
 
 }

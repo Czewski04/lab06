@@ -7,15 +7,9 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 public class RiverSectionApp extends Application {
-    public static void main(String[] args) throws IOException, InterruptedException {
-//        RiverSectionService river = new RiverSectionService(7, 500, "localhost");
-//        river.startServer();
-//        TimeUnit.SECONDS.sleep(5);
-//        river.sendRiverSectionData("localhost", 400);
-//        river.sendRiverSectionData("localhost", 998);
+    public static void main(String[] args) {
         launch(args);
     }
 
@@ -27,7 +21,6 @@ public class RiverSectionApp extends Application {
         RiverSectionController controller = loader.getController();
         RiverSectionService riverSectionService = new RiverSectionService(controller);
         controller.setRiverSectionService(riverSectionService);
-
 
         stage.setTitle("River Section");
         stage.setScene(new Scene(root));

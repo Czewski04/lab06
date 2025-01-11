@@ -30,7 +30,6 @@ public class RiverSectionService implements IRiverSection {
         this.controller = controller;
     }
 
-
     public void configuration(float delay, int ownPort, String ownHost, int environmentPort, String environmentBasinHost, int inBasinPort, String inBasinHost) throws IOException {
         this.delay = delay;
         this.ownPort = ownPort;
@@ -54,7 +53,6 @@ public class RiverSectionService implements IRiverSection {
                 } catch (InterruptedException | IOException e) {
                     throw new RuntimeException(e);
                 }
-                System.out.println("basin running");
             }
         });
         thread.start();
@@ -95,7 +93,6 @@ public class RiverSectionService implements IRiverSection {
     public void assignsRetentionBasin(int port, String host) {
         this.outBasinHost = host;
         this.outBasinPort = port;
-        System.out.println("retention basin assigned");
     }
 
     public void sendRiverSectionData(String host, int port) throws IOException {
@@ -146,7 +143,6 @@ public class RiverSectionService implements IRiverSection {
     }
 
     public void handleRequest(String request) throws IOException {
-        System.out.println(request);
         if(request.startsWith("srd:")){
             int discharge = Integer.parseInt(request.substring(4));
             setRealDischarge(discharge);
